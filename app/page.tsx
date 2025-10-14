@@ -3,6 +3,7 @@
 import { ClaimDialog } from "@/components/ClaimDialog";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { WinnerContext } from "@/hooks/WinnerContext";
 import {
   Ghost,
@@ -22,6 +23,7 @@ import {
   X,
   Badge,
   Crown,
+  Frown,
 } from "lucide-react";
 import { useContext, useEffect, useState } from "react";
 
@@ -33,6 +35,8 @@ export default function HalloweenPuno() {
     seconds: 0,
   });
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [winner, setWinner] = useState<string | null>(null);
@@ -40,11 +44,14 @@ export default function HalloweenPuno() {
   const [awardWinId, setAwardWindId] = useState(0);
   const { prizes, winners } = useContext(WinnerContext);
   const [claimWinner, setClaimWinner] = useState(false);
+  const [ticketCode, setTicketCode] = useState("");
+  const [ticketValidated, setTicketValidated] = useState(false);
+  const [ticketNumber, setTicketNumber] = useState("");
+  const [attemp, setAttemp] = useState(false);
 
   const spinWheel = () => {
     if (isSpinning) return;
 
-    // 🔹 Filtramos solo los premios NO entregados
     const availablePrizes = prizes.filter((p) => !p.awarded);
 
     if (availablePrizes.length === 0) {
@@ -52,8 +59,11 @@ export default function HalloweenPuno() {
       return;
     }
 
+    const winProbability = 0.8;
+
     setIsSpinning(true);
     setWinner(null);
+    setAwardWindId(0);
 
     const spins = 8 + Math.floor(Math.random() * 3);
     const randomDegree = Math.floor(Math.random() * 360);
@@ -63,18 +73,34 @@ export default function HalloweenPuno() {
 
     setTimeout(() => {
       const normalizedRotation = totalRotation % 360;
+
+      const didWin = Math.random() < winProbability;
+      setAttemp(true);
+
+      if (!didWin) {
+        setWinner("No gana un premio");
+        setAwardWindId(0);
+        setIsSpinning(false);
+
+        console.log("💨 Resultado: no gana premio");
+        return;
+      }
+
       const prizeIndex = Math.floor(
         ((360 - normalizedRotation + 22.5) % 360) /
           (360 / availablePrizes.length)
       );
 
-      const selectedPrize = availablePrizes[prizeIndex];
+      const safeIndex =
+        prizeIndex >= 0 && prizeIndex < availablePrizes.length
+          ? prizeIndex
+          : Math.floor(Math.random() * availablePrizes.length);
+
+      const selectedPrize = availablePrizes[safeIndex];
 
       setWinner(selectedPrize.name);
       setAwardWindId(selectedPrize.id);
       setIsSpinning(false);
-
-      console.log("🎯 Premio seleccionado:", selectedPrize);
     }, 5000);
   };
 
@@ -154,6 +180,29 @@ export default function HalloweenPuno() {
       element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
     setMobileMenuOpen(false);
+  };
+
+  const validateTicket = async () => {
+    if (!ticketCode) return alert("Ingresa tu código de ticket");
+
+    try {
+      const response = await fetch(`${API_URL}/codes/redeem`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: ticketCode }),
+      });
+      const data = await response.json();
+
+      if (data.used) {
+        setTicketValidated(true);
+        setTicketNumber(data.used.ticket_number);
+      } else {
+        setTicketValidated(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error validando ticket");
+    }
   };
 
   return (
@@ -412,213 +461,257 @@ export default function HalloweenPuno() {
         </div>
       </section>
 
-      <section
-        id="ruleta"
-        className="py-32 relative overflow-hidden bg-gradient-to-b from-background via-card/30 to-background"
-      >
-        <div className="absolute inset-0">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[200px]" />
-        </div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl md:text-7xl font-black mb-6 text-balance">
-                RULETA DE <span className="text-primary">PREMIOS</span>
-              </h2>
-              <p className="text-xl text-muted-foreground text-pretty leading-relaxed max-w-3xl mx-auto">
-                Todos los asistentes participan automáticamente. Gira la ruleta
-                y gana increíbles premios durante la noche.
-              </p>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              <div className="flex flex-col items-center">
-                <div className="relative w-full max-w-md aspect-square mb-10">
-                  {/* Puntero mejorado */}
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 z-20">
-                    <div className="relative">
-                      <div className="w-0 h-0 border-l-[25px] border-l-transparent border-r-[25px] border-r-transparent border-t-[50px] border-t-primary drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary/40 rounded-full blur-2xl" />
-                    </div>
-                  </div>
-
-                  <div className="relative w-full h-full">
-                    {/* Anillo de brillo exterior mejorado */}
-                    <div className="absolute inset-0 rounded-full bg-primary/30 blur-3xl animate-pulse" />
-                    <div
-                      className="absolute inset-4 rounded-full bg-primary/20 blur-2xl animate-pulse"
-                      style={{ animationDelay: "0.5s" }}
-                    />
-
-                    {/* Contenedor de la ruleta mejorado */}
-                    <div
-                      className="relative w-full h-full rounded-full border-[12px] border-primary shadow-[0_0_60px_rgba(255,0,102,0.6)] overflow-hidden bg-card"
-                      style={{
-                        transform: `rotate(${rotation}deg)`,
-                        transition: isSpinning
-                          ? "transform 5s cubic-bezier(0.17, 0.67, 0.05, 1)"
-                          : "none",
-                      }}
-                    >
-                      {prizes.map((prize, index) => {
-                        const rotation = (360 / prizes.length) * index;
-                        const skewY = 90 - 360 / prizes.length;
-                        const isEven = index % 2 === 0;
-
-                        return (
-                          <div
-                            key={prize.id}
-                            className={`absolute w-1/2 h-1/2 origin-bottom-right ${
-                              isEven
-                                ? "bg-gradient-to-br from-primary via-primary to-primary/70"
-                                : "bg-gradient-to-br from-secondary via-secondary to-secondary/70"
-                            }`}
-                            style={{
-                              transform: `rotate(${rotation}deg) skewY(${skewY}deg)`,
-                              clipPath: "polygon(0 0, 100% 0, 100% 100%)",
-                            }}
-                          >
-                            <div
-                              className="absolute top-[15%] left-[25%] text-sm font-black text-white text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                              style={{
-                                transform: `skewY(${-skewY}deg) rotate(${
-                                  360 / prizes.length / 2
-                                }deg)`,
-                                width: "100px",
-                              }}
-                            >
-                              {prize.name}
-                            </div>
-                          </div>
-                        );
-                      })}
-
-                      {/* Centro de la ruleta mejorado */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-card to-background border-4 border-primary flex items-center justify-center shadow-2xl">
-                        <Ghost className="w-12 h-12 text-primary animate-pulse drop-shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <Button
-                  size="lg"
-                  onClick={spinWheel}
-                  disabled={isSpinning}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 text-2xl px-16 py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.8)] transition-all disabled:opacity-50 hover:scale-110 font-black tracking-wide"
-                >
-                  {isSpinning ? (
-                    <span className="flex items-center gap-3">
-                      <div className="w-6 h-6 border-3 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      GIRANDO...
-                    </span>
-                  ) : (
-                    "GIRAR RULETA"
-                  )}
-                </Button>
-
-                {winner && (
-                  <Card className="mt-8 p-10 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/30 border-3 border-primary animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-primary/40 backdrop-blur-xl">
-                    <div className="text-center">
-                      <div className="relative inline-block mb-6">
-                        <Sparkles className="w-16 h-16 text-primary animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
-                        <div className="absolute inset-0 bg-primary/40 rounded-full blur-2xl" />
-                      </div>
-                      <h3 className="text-4xl font-black mb-3">
-                        ¡FELICIDADES!
-                      </h3>
-                      <p className="text-lg text-muted-foreground mb-4 font-semibold">
-                        Has ganado:
-                      </p>
-                      <p className="text-5xl font-black text-primary mt-3 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
-                        {winner}
-                      </p>
-                      <Button
-                        className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 text-2xl px-16 py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.8)] transition-all disabled:opacity-50 hover:scale-110 font-black tracking-wide"
-                        size={"sm"}
-                        onClick={() => setClaimWinner(true)}
-                      >
-                        Reclamar premio
-                      </Button>
-                    </div>
-                  </Card>
-                )}
-
-                <ClaimDialog
-                  open={claimWinner}
-                  onClose={() => setClaimWinner(false)}
-                  awardId={awardWinId}
-                  setWinner={setWinner}
-                />
+      <div className="relative flex flex-col items-center">
+        {/* Overlay para deshabilitar ruleta */}
+        {!ticketValidated && (
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm rounded-full">
+            <Input
+              value={ticketCode}
+              onChange={(e) => setTicketCode(e.target.value)}
+              placeholder="Ingresa tu código de ticket"
+              className="mb-4 p-4 text-center w-[250px]"
+            />
+            <Button
+              onClick={validateTicket}
+              className="px-8 py-4 text-lg font-bold"
+            >
+              Validar Ticket
+            </Button>
+          </div>
+        )}
+        {/* Ruleta */}
+        <section
+          id="ruleta"
+          className="py-32 relative overflow-hidden bg-gradient-to-b from-background via-card/30 to-background"
+        >
+          <div className="absolute inset-0">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[200px]" />
+          </div>
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-20">
+                <h2 className="text-6xl md:text-7xl font-black mb-6 text-balance">
+                  RULETA DE <span className="text-primary">PREMIOS</span>
+                </h2>
+                <p className="text-xl text-muted-foreground text-pretty leading-relaxed max-w-3xl mx-auto">
+                  Todos los asistentes participan automáticamente. Gira la
+                  ruleta y gana increíbles premios durante la noche.
+                </p>
               </div>
 
-              <div className="space-y-6">
-                <Card className="p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/30 shadow-2xl">
-                  <h3 className="text-3xl font-black mb-6 flex items-center gap-3">
-                    <Star className="w-8 h-8 text-primary" />
-                    Premios Disponibles
-                  </h3>
-                  <div className="grid grid-cols-1 gap-4">
-                    {prizes.map((award, index) => (
-                      <div className="flex items-center gap-4 p-5 rounded-xl bg-gradient-to-r from-card/80 to-transparent border-2 border-primary/20 hover:border-primary/60 hover:bg-card transition-all hover:scale-105 justify-between">
-                        <div key={award.id} className="flex items-center gap-4">
-                          <div className="w-4 h-4 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
-                          <span className="font-bold text-lg">
-                            {award.name}
-                          </span>
-                        </div>
-                        <div className="text-white">
-                          {award.awarded == true ? "Agotado" : ""}
+              <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="flex flex-col items-center">
+                  <div className="relative w-full max-w-md aspect-square mb-10">
+                    {/* Puntero mejorado */}
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-3 z-20">
+                      <div className="relative">
+                        <div className="w-0 h-0 border-l-[25px] border-l-transparent border-r-[25px] border-r-transparent border-t-[50px] border-t-primary drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-12 bg-primary/40 rounded-full blur-2xl" />
+                      </div>
+                    </div>
+
+                    <div className="relative w-full h-full">
+                      <div className="absolute inset-0 rounded-full bg-primary/30 blur-3xl animate-pulse" />
+                      <div
+                        className="absolute inset-4 rounded-full bg-primary/20 blur-2xl animate-pulse"
+                        style={{ animationDelay: "0.5s" }}
+                      />
+
+                      <div
+                        className="relative w-full h-full rounded-full border-[12px] border-primary shadow-[0_0_60px_rgba(255,0,102,0.6)] overflow-hidden bg-card"
+                        style={{
+                          transform: `rotate(${rotation}deg)`,
+                          transition: isSpinning
+                            ? "transform 5s cubic-bezier(0.17, 0.67, 0.05, 1)"
+                            : "none",
+                        }}
+                      >
+                        {prizes.map((prize, index) => {
+                          const rotation = (360 / prizes.length) * index;
+                          const skewY = 90 - 360 / prizes.length;
+                          const isEven = index % 2 === 0;
+
+                          return (
+                            <div
+                              key={prize.id}
+                              className={`absolute w-1/2 h-1/2 origin-bottom-right ${
+                                isEven
+                                  ? "bg-gradient-to-br from-primary via-primary to-primary/70"
+                                  : "bg-gradient-to-br from-secondary via-secondary to-secondary/70"
+                              }`}
+                              style={{
+                                transform: `rotate(${rotation}deg) skewY(${skewY}deg)`,
+                                clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+                              }}
+                            >
+                              <div
+                                className="absolute top-[15%] left-[25%] text-sm font-black text-white text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                                style={{
+                                  transform: `skewY(${-skewY}deg) rotate(${
+                                    360 / prizes.length / 2
+                                  }deg)`,
+                                  width: "100px",
+                                }}
+                              >
+                                {prize.name}
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                        {/* Centro de la ruleta mejorado */}
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-gradient-to-br from-card to-background border-4 border-primary flex items-center justify-center shadow-2xl">
+                          <Ghost className="w-12 h-12 text-primary animate-pulse drop-shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
                         </div>
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </Card>
 
-                <Card className="p-8 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/40 shadow-xl backdrop-blur-xl">
-                  <h4 className="font-black text-xl mb-5 flex items-center gap-3">
-                    <Ticket className="w-6 h-6 text-primary" />
-                    Cómo Participar
-                  </h4>
-                  <ul className="space-y-4 text-sm text-muted-foreground">
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">
-                        Compra tu entrada para el evento
-                      </span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">
-                        Regístrate en la entrada con tu código QR
-                      </span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">
-                        Participa en los sorteos durante la noche
-                      </span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">
-                        Gana increíbles premios instantáneos
-                      </span>
-                    </li>
-                  </ul>
-                </Card>
+                  {!attemp && (
+                    <Button
+                      size="lg"
+                      onClick={spinWheel}
+                      disabled={isSpinning}
+                      className="bg-primary text-primary-foreground hover:bg-primary/90 text-2xl px-16 py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.8)] transition-all disabled:opacity-50 hover:scale-110 font-black tracking-wide"
+                    >
+                      {isSpinning ? (
+                        <span className="flex items-center gap-3">
+                          <div className="w-6 h-6 border-3 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
+                          GIRANDO...
+                        </span>
+                      ) : (
+                        "GIRAR RULETA"
+                      )}
+                    </Button>
+                  )}
 
-                <Card className="p-6 bg-gradient-to-br from-secondary/20 to-secondary/5 border-2 border-secondary/40 shadow-lg backdrop-blur-xl">
-                  <p className="text-sm text-muted-foreground text-center flex items-center justify-center gap-3 font-semibold">
-                    <PartyPopper className="w-6 h-6 text-primary" />
-                    Se realizarán múltiples sorteos durante toda la noche
-                  </p>
-                </Card>
+                  {awardWinId != 0 && winner && (
+                    <Card className="mt-8 p-10 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/30 border-3 border-primary animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-primary/40 backdrop-blur-xl">
+                      <div className="text-center">
+                        <div className="relative inline-block mb-6">
+                          <Sparkles className="w-16 h-16 text-primary animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
+                          <div className="absolute inset-0 bg-primary/40 rounded-full blur-2xl" />
+                        </div>
+                        <h3 className="text-4xl font-black mb-3">
+                          ¡FELICIDADES!
+                        </h3>
+                        <p className="text-lg text-muted-foreground mb-4 font-semibold">
+                          Has ganado:
+                        </p>
+                        <p className="text-5xl font-black text-primary mt-3 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
+                          {winner}
+                        </p>
+                        <Button
+                          className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 text-2xl px-16 py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.8)] transition-all disabled:opacity-50 hover:scale-110 font-black tracking-wide"
+                          size={"sm"}
+                          onClick={() => setClaimWinner(true)}
+                        >
+                          Reclamar premio
+                        </Button>
+                      </div>
+                    </Card>
+                  )}
+
+                  {awardWinId == 0 && winner && (
+                    <Card className="mt-8 p-10 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/30 border-3 border-primary animate-in fade-in slide-in-from-bottom-4 duration-500 shadow-2xl shadow-primary/40 backdrop-blur-xl">
+                      <div className="text-center">
+                        <div className="relative inline-block mb-6">
+                          <Frown className="w-16 h-16 text-primary animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
+                          <div className="absolute inset-0 bg-primary/40 rounded-full blur-2xl" />
+                        </div>
+                        <h3 className="text-4xl font-black mb-3">
+                          LASTIMA 
+                        </h3>
+                        <p className="text-lg text-muted-foreground mb-4 font-semibold">
+                          Has ganado:
+                        </p>
+                        <p className="text-5xl font-black text-primary mt-3 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
+                          {winner}
+                        </p>
+                      </div>
+                    </Card>
+                  )}
+
+                  <ClaimDialog
+                    open={claimWinner}
+                    onClose={() => setClaimWinner(false)}
+                    awardId={awardWinId}
+                    setWinner={setWinner}
+                    ticket={ticketNumber}
+                  />
+                </div>
+
+                <div className="space-y-6">
+                  <Card className="p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/30 shadow-2xl">
+                    <h3 className="text-3xl font-black mb-6 flex items-center gap-3">
+                      <Star className="w-8 h-8 text-primary" />
+                      Premios Disponibles
+                    </h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      {prizes.map((award) => (
+                        <div className="flex items-center gap-4 p-5 rounded-xl bg-gradient-to-r from-card/80 to-transparent border-2 border-primary/20 hover:border-primary/60 hover:bg-card transition-all hover:scale-105 justify-between">
+                          <div
+                            key={award.id}
+                            className="flex items-center gap-4"
+                          >
+                            <div className="w-4 h-4 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
+                            <span className="font-bold text-lg">
+                              {award.name}
+                            </span>
+                          </div>
+                          <div className="text-white">
+                            {award.awarded == true ? "Agotado" : ""}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
+
+                  <Card className="p-8 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/40 shadow-xl backdrop-blur-xl">
+                    <h4 className="font-black text-xl mb-5 flex items-center gap-3">
+                      <Ticket className="w-6 h-6 text-primary" />
+                      Cómo Participar
+                    </h4>
+                    <ul className="space-y-4 text-sm text-muted-foreground">
+                      <li className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="font-semibold">
+                          Compra tu entrada para el evento
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="font-semibold">
+                          Regístrate en la entrada con tu código QR
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="font-semibold">
+                          Participa en los sorteos durante la noche
+                        </span>
+                      </li>
+                      <li className="flex items-center gap-3">
+                        <div className="w-2 h-2 rounded-full bg-primary" />
+                        <span className="font-semibold">
+                          Gana increíbles premios instantáneos
+                        </span>
+                      </li>
+                    </ul>
+                  </Card>
+
+                  <Card className="p-6 bg-gradient-to-br from-secondary/20 to-secondary/5 border-2 border-secondary/40 shadow-lg backdrop-blur-xl">
+                    <p className="text-sm text-muted-foreground text-center flex items-center justify-center gap-3 font-semibold">
+                      <PartyPopper className="w-6 h-6 text-primary" />
+                      Se realizarán múltiples sorteos durante toda la noche
+                    </p>
+                  </Card>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
       <section id="ubicacion" className="py-24 relative bg-card/30">
         <div className="container mx-auto px-4">

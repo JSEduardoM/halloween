@@ -5,7 +5,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useContext, useState } from "react";
 import { WinnerContext } from "@/hooks/WinnerContext";
@@ -14,14 +13,15 @@ export function ClaimDialog({
   open,
   onClose,
   awardId,
+  ticket,
   setWinner,
 }: {
   open: boolean;
   onClose: () => void;
-  awardId: number;
+  awardId: number | null;
+  ticket: string;
   setWinner: (data: null) => void;
 }) {
-  const [ticket, setTicket] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const { fetchPrizes } = useContext(WinnerContext);
@@ -30,39 +30,25 @@ export function ClaimDialog({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!awardId || !ticket) return;
+
     setLoading(true);
     setMessage("");
 
     try {
-      const res = await fetch(`${API_URL}/codes/redeem`, {
+      const res = await fetch(`${API_URL}/awards/assign`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: ticket }),
+        body: JSON.stringify({ awardId, ticketNumber: ticket }),
       });
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setMessage(`❌ ${data.msg || "Código inválido o ya usado."}`);
-        return;
-      }
-
-      const assignRes = await fetch(`${API_URL}/awards/assign`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          awardId: awardId,
-          ticketNumber: data.used.ticket_number,
-        }),
-      });
-
-      const assignData = await assignRes.json();
-
-      if (assignRes.ok) {
-        setMessage(`🎉 ¡Felicidades! Has ganado: ${assignData.award.name}`);
+      if (res.ok) {
+        setMessage(`🎉 ¡Felicidades! Has ganado: ${data.award.name}`);
         setTimeout(() => onClose(), 2500);
       } else {
-        setMessage(`⚠️ ${assignData.msg || "Error al asignar el premio."}`);
+        setMessage(`⚠️ ${data.msg || "Error al asignar el premio."}`);
       }
     } catch (error) {
       console.error(error);
@@ -87,21 +73,9 @@ export function ClaimDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 mt-4">
-          <label
-            htmlFor="ticket"
-            className="text-lg text-muted-foreground mb-4 font-semibold"
-          >
-            Ingresa tu código o número de ticket:
-          </label>
-          <Input
-            id="ticket"
-            type="text"
-            value={ticket}
-            onChange={(e) => setTicket(e.target.value)}
-            placeholder="Ej: ABC12345"
-            className="p-4"
-            required
-          />
+          <p className="text-center text-lg font-semibold">
+            Ticket: {ticket}
+          </p>
 
           {message && (
             <p
