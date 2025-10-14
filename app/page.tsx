@@ -1,7 +1,9 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { ClaimDialog } from "@/components/ClaimDialog";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { WinnerContext } from "@/hooks/WinnerContext";
 import {
   Ghost,
   Calendar,
@@ -18,8 +20,10 @@ import {
   Heart,
   Menu,
   X,
-} from "lucide-react"
-import { useEffect, useState } from "react"
+  Badge,
+  Crown,
+} from "lucide-react";
+import { useContext, useEffect, useState } from "react";
 
 export default function HalloweenPuno() {
   const [timeLeft, setTimeLeft] = useState({
@@ -27,50 +31,59 @@ export default function HalloweenPuno() {
     hours: 0,
     minutes: 0,
     seconds: 0,
-  })
+  });
 
-  const [isSpinning, setIsSpinning] = useState(false)
-  const [rotation, setRotation] = useState(0)
-  const [winner, setWinner] = useState<string | null>(null)
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-
-  const prizes = [
-    "Entrada VIP Gratis",
-    "2x1 en Bebidas",
-    "Meet & Greet DJs",
-    "Merchandising",
-    "Descuento 50%",
-    "Barra Libre 1h",
-    "Foto con DJs",
-    "Entrada Premium",
-  ]
+  const [isSpinning, setIsSpinning] = useState(false);
+  const [rotation, setRotation] = useState(0);
+  const [winner, setWinner] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [awardWinId, setAwardWindId] = useState(0);
+  const { prizes, winners } = useContext(WinnerContext);
+  const [claimWinner, setClaimWinner] = useState(false);
 
   const spinWheel = () => {
-    if (isSpinning) return
+    if (isSpinning) return;
 
-    setIsSpinning(true)
-    setWinner(null)
+    // 🔹 Filtramos solo los premios NO entregados
+    const availablePrizes = prizes.filter((p) => !p.awarded);
 
-    const spins = 8 + Math.floor(Math.random() * 3)
-    const randomDegree = Math.floor(Math.random() * 360)
-    const totalRotation = rotation + spins * 360 + randomDegree
+    if (availablePrizes.length === 0) {
+      alert("🎉 Todos los premios ya fueron asignados");
+      return;
+    }
 
-    setRotation(totalRotation)
+    setIsSpinning(true);
+    setWinner(null);
+
+    const spins = 8 + Math.floor(Math.random() * 3);
+    const randomDegree = Math.floor(Math.random() * 360);
+    const totalRotation = rotation + spins * 360 + randomDegree;
+
+    setRotation(totalRotation);
 
     setTimeout(() => {
-      const normalizedRotation = totalRotation % 360
-      const prizeIndex = Math.floor(((360 - normalizedRotation + 22.5) % 360) / (360 / prizes.length))
-      setWinner(prizes[prizeIndex])
-      setIsSpinning(false)
-    }, 5000)
-  }
+      const normalizedRotation = totalRotation % 360;
+      const prizeIndex = Math.floor(
+        ((360 - normalizedRotation + 22.5) % 360) /
+          (360 / availablePrizes.length)
+      );
+
+      const selectedPrize = availablePrizes[prizeIndex];
+
+      setWinner(selectedPrize.name);
+      setAwardWindId(selectedPrize.id);
+      setIsSpinning(false);
+
+      console.log("🎯 Premio seleccionado:", selectedPrize);
+    }, 5000);
+  };
 
   useEffect(() => {
-    const eventDate = new Date("2025-10-31T20:00:00")
+    const eventDate = new Date("2025-10-31T20:00:00");
 
     const timer = setInterval(() => {
-      const now = new Date()
-      const difference = eventDate.getTime() - now.getTime()
+      const now = new Date();
+      const difference = eventDate.getTime() - now.getTime();
 
       if (difference > 0) {
         setTimeLeft({
@@ -78,17 +91,16 @@ export default function HalloweenPuno() {
           hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
           minutes: Math.floor((difference / 1000 / 60) % 60),
           seconds: Math.floor((difference / 1000) % 60),
-        })
+        });
       }
-    }, 1000)
+    }, 1000);
 
-    return () => clearInterval(timer)
-  }, [])
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
-    // Crear un elemento de cursor personalizado que parpadee
-    const cursorGhost = document.createElement("div")
-    cursorGhost.innerHTML = "👻"
+    const cursorGhost = document.createElement("div");
+    cursorGhost.innerHTML = "👻";
     cursorGhost.style.cssText = `
       position: fixed;
       pointer-events: none;
@@ -97,10 +109,10 @@ export default function HalloweenPuno() {
       transform: translate(-50%, -50%);
       animation: ghost-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       transition: transform 0.1s ease;
-    `
+    `;
 
     // Añadir la animación de parpadeo
-    const style = document.createElement("style")
+    const style = document.createElement("style");
     style.textContent = `
       @keyframes ghost-pulse {
         0%, 100% {
@@ -112,37 +124,37 @@ export default function HalloweenPuno() {
           filter: drop-shadow(0 0 5px rgba(255, 0, 102, 0.4));
         }
       }
-    `
-    document.head.appendChild(style)
-    document.body.appendChild(cursorGhost)
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(cursorGhost);
 
     // Ocultar el cursor predeterminado
-    document.body.style.cursor = "none"
+    document.body.style.cursor = "none";
 
     // Seguir el movimiento del mouse
     const moveCursor = (e: MouseEvent) => {
-      cursorGhost.style.left = e.clientX + "px"
-      cursorGhost.style.top = e.clientY + "px"
-    }
+      cursorGhost.style.left = e.clientX + "px";
+      cursorGhost.style.top = e.clientY + "px";
+    };
 
-    document.addEventListener("mousemove", moveCursor)
+    document.addEventListener("mousemove", moveCursor);
 
     // Limpiar al desmontar
     return () => {
-      document.removeEventListener("mousemove", moveCursor)
-      document.body.removeChild(cursorGhost)
-      document.head.removeChild(style)
-      document.body.style.cursor = "auto"
-    }
-  }, [])
+      document.removeEventListener("mousemove", moveCursor);
+      document.body.removeChild(cursorGhost);
+      document.head.removeChild(style);
+      document.body.style.cursor = "auto";
+    };
+  }, []);
 
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId)
+    const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" })
+      element.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-    setMobileMenuOpen(false)
-  }
+    setMobileMenuOpen(false);
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -195,7 +207,11 @@ export default function HalloweenPuno() {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 text-foreground hover:text-primary transition-colors"
           >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {mobileMenuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
         </nav>
 
@@ -307,12 +323,16 @@ export default function HalloweenPuno() {
             <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-[10rem] font-black mb-6 sm:mb-10 text-balance leading-[0.9] tracking-tight">
               LA ZONA
               <br />
-              <span className="text-primary drop-shadow-[0_0_30px_rgba(255,0,102,0.8)]">DEL PECADO</span>
+              <span className="text-primary drop-shadow-[0_0_30px_rgba(255,0,102,0.8)]">
+                DEL PECADO
+              </span>
             </h1>
 
             <p className="text-lg sm:text-2xl md:text-3xl text-muted-foreground mb-10 sm:mb-14 max-w-4xl mx-auto text-pretty leading-relaxed font-light px-4">
-              La celebración más espectacular de <span className="text-primary font-semibold">Puno</span>. Una noche
-              épica de música, disfraces y experiencias inolvidables a orillas del Lago Titicaca.
+              La celebración más espectacular de{" "}
+              <span className="text-primary font-semibold">Puno</span>. Una
+              noche épica de música, disfraces y experiencias inolvidables a
+              orillas del Lago Titicaca.
             </p>
 
             {/* CTAs principales */}
@@ -338,26 +358,42 @@ export default function HalloweenPuno() {
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-5xl mx-auto">
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
-                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">31 OCT</div>
-                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">8:00 PM - 3:00 AM</div>
+                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
+                  31 OCT
+                </div>
+                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
+                  8:00 PM - 3:00 AM
+                </div>
               </Card>
 
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
-                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">PUNO</div>
-                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">Local Club del Tiro</div>
+                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
+                  PUNO
+                </div>
+                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
+                  Local Club del Tiro
+                </div>
               </Card>
 
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <Music className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
-                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">DJ</div>
-                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">+ 2 Bandas en Vivo</div>
+                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
+                  DJ
+                </div>
+                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
+                  + 2 Bandas en Vivo
+                </div>
               </Card>
 
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <Users className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
-                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">500+</div>
-                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">Asistentes</div>
+                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
+                  500+
+                </div>
+                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
+                  Asistentes
+                </div>
               </Card>
             </div>
           </div>
@@ -366,7 +402,9 @@ export default function HalloweenPuno() {
         {/* Indicador de scroll */}
         <div className="absolute bottom-6 sm:bottom-10 left-1/2 -translate-x-1/2 animate-bounce hidden sm:block">
           <div className="flex flex-col items-center gap-2">
-            <div className="text-muted-foreground text-xs uppercase tracking-widest font-bold">Descubre más</div>
+            <div className="text-muted-foreground text-xs uppercase tracking-widest font-bold">
+              Descubre más
+            </div>
             <div className="w-6 h-10 border-2 border-primary/50 rounded-full flex items-start justify-center p-2">
               <div className="w-1.5 h-3 bg-primary rounded-full animate-pulse" />
             </div>
@@ -388,8 +426,8 @@ export default function HalloweenPuno() {
                 RULETA DE <span className="text-primary">PREMIOS</span>
               </h2>
               <p className="text-xl text-muted-foreground text-pretty leading-relaxed max-w-3xl mx-auto">
-                Todos los asistentes participan automáticamente. Gira la ruleta y gana increíbles premios durante la
-                noche.
+                Todos los asistentes participan automáticamente. Gira la ruleta
+                y gana increíbles premios durante la noche.
               </p>
             </div>
 
@@ -417,17 +455,19 @@ export default function HalloweenPuno() {
                       className="relative w-full h-full rounded-full border-[12px] border-primary shadow-[0_0_60px_rgba(255,0,102,0.6)] overflow-hidden bg-card"
                       style={{
                         transform: `rotate(${rotation}deg)`,
-                        transition: isSpinning ? "transform 5s cubic-bezier(0.17, 0.67, 0.05, 1)" : "none",
+                        transition: isSpinning
+                          ? "transform 5s cubic-bezier(0.17, 0.67, 0.05, 1)"
+                          : "none",
                       }}
                     >
                       {prizes.map((prize, index) => {
-                        const rotation = (360 / prizes.length) * index
-                        const skewY = 90 - 360 / prizes.length
-                        const isEven = index % 2 === 0
+                        const rotation = (360 / prizes.length) * index;
+                        const skewY = 90 - 360 / prizes.length;
+                        const isEven = index % 2 === 0;
 
                         return (
                           <div
-                            key={index}
+                            key={prize.id}
                             className={`absolute w-1/2 h-1/2 origin-bottom-right ${
                               isEven
                                 ? "bg-gradient-to-br from-primary via-primary to-primary/70"
@@ -441,14 +481,16 @@ export default function HalloweenPuno() {
                             <div
                               className="absolute top-[15%] left-[25%] text-sm font-black text-white text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                               style={{
-                                transform: `skewY(${-skewY}deg) rotate(${360 / prizes.length / 2}deg)`,
+                                transform: `skewY(${-skewY}deg) rotate(${
+                                  360 / prizes.length / 2
+                                }deg)`,
                                 width: "100px",
                               }}
                             >
-                              {prize}
+                              {prize.name}
                             </div>
                           </div>
-                        )
+                        );
                       })}
 
                       {/* Centro de la ruleta mejorado */}
@@ -482,14 +524,32 @@ export default function HalloweenPuno() {
                         <Sparkles className="w-16 h-16 text-primary animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.8)]" />
                         <div className="absolute inset-0 bg-primary/40 rounded-full blur-2xl" />
                       </div>
-                      <h3 className="text-4xl font-black mb-3">¡FELICIDADES!</h3>
-                      <p className="text-lg text-muted-foreground mb-4 font-semibold">Has ganado:</p>
+                      <h3 className="text-4xl font-black mb-3">
+                        ¡FELICIDADES!
+                      </h3>
+                      <p className="text-lg text-muted-foreground mb-4 font-semibold">
+                        Has ganado:
+                      </p>
                       <p className="text-5xl font-black text-primary mt-3 animate-pulse drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
                         {winner}
                       </p>
+                      <Button
+                        className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 text-2xl px-16 py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.8)] transition-all disabled:opacity-50 hover:scale-110 font-black tracking-wide"
+                        size={"sm"}
+                        onClick={() => setClaimWinner(true)}
+                      >
+                        Reclamar premio
+                      </Button>
                     </div>
                   </Card>
                 )}
+
+                <ClaimDialog
+                  open={claimWinner}
+                  onClose={() => setClaimWinner(false)}
+                  awardId={awardWinId}
+                  setWinner={setWinner}
+                />
               </div>
 
               <div className="space-y-6">
@@ -499,13 +559,17 @@ export default function HalloweenPuno() {
                     Premios Disponibles
                   </h3>
                   <div className="grid grid-cols-1 gap-4">
-                    {prizes.map((prize, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center gap-4 p-5 rounded-xl bg-gradient-to-r from-card/80 to-transparent border-2 border-primary/20 hover:border-primary/60 hover:bg-card transition-all hover:scale-105"
-                      >
-                        <div className="w-4 h-4 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
-                        <span className="font-bold text-lg">{prize}</span>
+                    {prizes.map((award, index) => (
+                      <div className="flex items-center gap-4 p-5 rounded-xl bg-gradient-to-r from-card/80 to-transparent border-2 border-primary/20 hover:border-primary/60 hover:bg-card transition-all hover:scale-105 justify-between">
+                        <div key={award.id} className="flex items-center gap-4">
+                          <div className="w-4 h-4 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,0,102,0.8)]" />
+                          <span className="font-bold text-lg">
+                            {award.name}
+                          </span>
+                        </div>
+                        <div className="text-white">
+                          {award.awarded == true ? "Agotado" : ""}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -519,19 +583,27 @@ export default function HalloweenPuno() {
                   <ul className="space-y-4 text-sm text-muted-foreground">
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Compra tu entrada para el evento</span>
+                      <span className="font-semibold">
+                        Compra tu entrada para el evento
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Regístrate en la entrada con tu código QR</span>
+                      <span className="font-semibold">
+                        Regístrate en la entrada con tu código QR
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Participa en los sorteos durante la noche</span>
+                      <span className="font-semibold">
+                        Participa en los sorteos durante la noche
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Gana increíbles premios instantáneos</span>
+                      <span className="font-semibold">
+                        Gana increíbles premios instantáneos
+                      </span>
                     </li>
                   </ul>
                 </Card>
@@ -548,6 +620,48 @@ export default function HalloweenPuno() {
         </div>
       </section>
 
+      <section id="ubicacion" className="py-24 relative bg-card/30">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-5xl md:text-6xl font-bold mb-16 flex items-center justify-center gap-3">
+              <Crown className="w-15 h-15 text-secondary" />
+              Lista de Ganadores
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="space-y-6">
+                <div className="flex flex-col gap-6">
+                  {winners &&
+                    winners.map((winner) => (
+                      <div
+                        key={winner.id}
+                        className="flex items-center gap-4 p-4 rounded-xl border border-primary/20 bg-primary/5"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Ghost className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="text-2xl font-bold">
+                            {" "}
+                            Ticket ganador: {winner.ticket_number}
+                          </h3>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+              <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
+                <img
+                  src="https://ih1.redbubble.net/image.5285392660.2914/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg"
+                  alt="Ghost with a black top hat"
+                  className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-500 bg-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="evento" className="py-32 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
         <div className="container mx-auto px-4 relative z-10">
@@ -557,7 +671,8 @@ export default function HalloweenPuno() {
                 UNA EXPERIENCIA <span className="text-primary">ÚNICA</span>
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                Prepárate para vivir la noche más terrorífica y emocionante del año
+                Prepárate para vivir la noche más terrorífica y emocionante del
+                año
               </p>
             </div>
 
@@ -566,10 +681,12 @@ export default function HalloweenPuno() {
                 <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center mb-8 group-hover:bg-primary/30 transition-colors group-hover:scale-110 duration-300 mx-auto">
                   <Trophy className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black mb-5 text-center">Concurso de Disfraces</h3>
+                <h3 className="text-3xl font-black mb-5 text-center">
+                  Concurso de Disfraces
+                </h3>
                 <p className="text-muted-foreground leading-relaxed mb-6 text-center">
-                  Premios increíbles para los mejores disfraces. Categorías: más terrorífico, más creativo, y mejor
-                  grupo.
+                  Premios increíbles para los mejores disfraces. Categorías: más
+                  terrorífico, más creativo, y mejor grupo.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <Star className="w-6 h-6" />
@@ -581,10 +698,12 @@ export default function HalloweenPuno() {
                 <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center mb-8 group-hover:bg-primary/30 transition-colors group-hover:scale-110 duration-300 mx-auto">
                   <Zap className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black mb-5 text-center">Música en Vivo</h3>
+                <h3 className="text-3xl font-black mb-5 text-center">
+                  Música en Vivo
+                </h3>
                 <p className="text-muted-foreground leading-relaxed mb-6 text-center">
-                  DJs locales e internacionales. Música electrónica, rock, y los mejores éxitos para bailar toda la
-                  noche.
+                  DJs locales e internacionales. Música electrónica, rock, y los
+                  mejores éxitos para bailar toda la noche.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <Sparkles className="w-6 h-6" />
@@ -596,9 +715,12 @@ export default function HalloweenPuno() {
                 <div className="w-20 h-20 rounded-2xl bg-primary/20 flex items-center justify-center mb-8 group-hover:bg-primary/30 transition-colors group-hover:scale-110 duration-300 mx-auto">
                   <Heart className="w-10 h-10 text-primary" />
                 </div>
-                <h3 className="text-3xl font-black mb-5 text-center">Experiencias VIP</h3>
+                <h3 className="text-3xl font-black mb-5 text-center">
+                  Experiencias VIP
+                </h3>
                 <p className="text-muted-foreground leading-relaxed mb-6 text-center">
-                  Acceso exclusivo a zonas VIP, bebidas premium, y la mejor vista del evento. Cupos limitados.
+                  Acceso exclusivo a zonas VIP, bebidas premium, y la mejor
+                  vista del evento. Cupos limitados.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <PartyPopper className="w-6 h-6" />
@@ -610,7 +732,10 @@ export default function HalloweenPuno() {
         </div>
       </section>
 
-      <section id="programa" className="py-24 relative bg-gradient-to-b from-background to-card/30">
+      <section
+        id="programa"
+        className="py-24 relative bg-gradient-to-b from-background to-card/30"
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-5xl md:text-6xl font-bold mb-8 text-center text-balance">
@@ -625,7 +750,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-primary/10 flex flex-col items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <div className="text-3xl font-bold text-primary">8:00</div>
+                      <div className="text-3xl font-bold text-primary">
+                        8:00
+                      </div>
                       <div className="text-xs text-muted-foreground">PM</div>
                     </div>
                   </div>
@@ -635,8 +762,9 @@ export default function HalloweenPuno() {
                       Apertura de Puertas
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Recepción de invitados, registro de participantes del concurso de disfraces y bienvenida con
-                      música ambiental de Halloween.
+                      Recepción de invitados, registro de participantes del
+                      concurso de disfraces y bienvenida con música ambiental de
+                      Halloween.
                     </p>
                   </div>
                 </div>
@@ -646,7 +774,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-secondary/10 flex flex-col items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                      <div className="text-3xl font-bold text-secondary">9:00</div>
+                      <div className="text-3xl font-bold text-secondary">
+                        9:00
+                      </div>
                       <div className="text-xs text-muted-foreground">PM</div>
                     </div>
                   </div>
@@ -656,8 +786,8 @@ export default function HalloweenPuno() {
                       DJ Set Opening - DJ Phantom
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Inicio oficial con el mejor DJ local. Música electrónica, house y los mejores remixes para
-                      calentar la pista.
+                      Inicio oficial con el mejor DJ local. Música electrónica,
+                      house y los mejores remixes para calentar la pista.
                     </p>
                   </div>
                 </div>
@@ -667,7 +797,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-primary/10 flex flex-col items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <div className="text-3xl font-bold text-primary">10:30</div>
+                      <div className="text-3xl font-bold text-primary">
+                        10:30
+                      </div>
                       <div className="text-xs text-muted-foreground">PM</div>
                     </div>
                   </div>
@@ -677,8 +809,9 @@ export default function HalloweenPuno() {
                       Concurso de Disfraces
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Desfile de participantes en el escenario principal. Categorías: Más Terrorífico, Más Creativo,
-                      Mejor Grupo. Premios de hasta S/ 500.
+                      Desfile de participantes en el escenario principal.
+                      Categorías: Más Terrorífico, Más Creativo, Mejor Grupo.
+                      Premios de hasta S/ 500.
                     </p>
                   </div>
                 </div>
@@ -688,7 +821,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-secondary/10 flex flex-col items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                      <div className="text-3xl font-bold text-secondary">11:30</div>
+                      <div className="text-3xl font-bold text-secondary">
+                        11:30
+                      </div>
                       <div className="text-xs text-muted-foreground">PM</div>
                     </div>
                   </div>
@@ -698,7 +833,8 @@ export default function HalloweenPuno() {
                       Banda en Vivo - Los Espectros
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Rock alternativo y covers de clásicos. Una hora de música en vivo con la mejor banda de Puno.
+                      Rock alternativo y covers de clásicos. Una hora de música
+                      en vivo con la mejor banda de Puno.
                     </p>
                   </div>
                 </div>
@@ -708,7 +844,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-primary/10 flex flex-col items-center justify-center group-hover:bg-primary/20 transition-colors">
-                      <div className="text-3xl font-bold text-primary">12:30</div>
+                      <div className="text-3xl font-bold text-primary">
+                        12:30
+                      </div>
                       <div className="text-xs text-muted-foreground">AM</div>
                     </div>
                   </div>
@@ -718,8 +856,8 @@ export default function HalloweenPuno() {
                       DJ Internacional - DJ Shadow
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      El momento más esperado de la noche. DJ invitado especial desde Lima con los mejores beats de EDM
-                      y techno.
+                      El momento más esperado de la noche. DJ invitado especial
+                      desde Lima con los mejores beats de EDM y techno.
                     </p>
                   </div>
                 </div>
@@ -729,7 +867,9 @@ export default function HalloweenPuno() {
                 <div className="flex flex-col md:flex-row gap-6 items-start">
                   <div className="flex-shrink-0">
                     <div className="w-24 h-24 rounded-2xl bg-secondary/10 flex flex-col items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                      <div className="text-3xl font-bold text-secondary">2:00</div>
+                      <div className="text-3xl font-bold text-secondary">
+                        2:00
+                      </div>
                       <div className="text-xs text-muted-foreground">AM</div>
                     </div>
                   </div>
@@ -739,8 +879,8 @@ export default function HalloweenPuno() {
                       Cierre Épico
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Última hora con los mejores éxitos de la noche. Sorpresas finales y despedida hasta el próximo
-                      año.
+                      Última hora con los mejores éxitos de la noche. Sorpresas
+                      finales y despedida hasta el próximo año.
                     </p>
                   </div>
                 </div>
@@ -751,8 +891,8 @@ export default function HalloweenPuno() {
               <Card className="inline-block p-6 bg-primary/5 border-primary/20">
                 <p className="text-sm text-muted-foreground">
                   <Clock className="w-4 h-4 inline mr-2" />
-                  El programa puede estar sujeto a cambios. Mantente atento a nuestras redes sociales para
-                  actualizaciones.
+                  El programa puede estar sujeto a cambios. Mantente atento a
+                  nuestras redes sociales para actualizaciones.
                 </p>
               </Card>
             </div>
@@ -775,7 +915,9 @@ export default function HalloweenPuno() {
                     <MapPin className="w-6 h-6 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold mb-2">Local club del tiro de Puno</h3>
+                    <h3 className="text-2xl font-bold mb-2">
+                      Local club del tiro de Puno
+                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Jr. Pineda Arce Nro 159, Club del tiro Puno
                     </p>
@@ -837,7 +979,6 @@ export default function HalloweenPuno() {
                   className="grayscale hover:grayscale-0 transition-all duration-500"
                 />
               </div>
-
             </div>
           </div>
         </div>
@@ -852,7 +993,8 @@ export default function HalloweenPuno() {
                 ASEGURA TU <span className="text-primary">ENTRADA</span>
               </h2>
               <p className="text-xl text-muted-foreground text-pretty leading-relaxed max-w-3xl mx-auto">
-                Las entradas se están agotando rápidamente. No te quedes fuera del evento más esperado de Puno.
+                Las entradas se están agotando rápidamente. No te quedes fuera
+                del evento más esperado de Puno.
               </p>
             </div>
 
@@ -862,16 +1004,24 @@ export default function HalloweenPuno() {
                   <div className="text-sm text-muted-foreground mb-3 uppercase tracking-[0.2em] font-bold">
                     Entrada Preventa
                   </div>
-                  <div className="text-6xl font-black mb-4 text-primary">S/ 7</div>
-                  <div className="text-base text-muted-foreground line-through mb-8">S/ 10</div>
+                  <div className="text-6xl font-black mb-4 text-primary">
+                    S/ 7
+                  </div>
+                  <div className="text-base text-muted-foreground line-through mb-8">
+                    S/ 10
+                  </div>
                   <ul className="space-y-4 text-sm text-left mb-10">
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Acceso al evento completo</span>
+                      <span className="font-semibold">
+                        Acceso al evento completo
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Participación en concursos</span>
+                      <span className="font-semibold">
+                        Participación en concursos
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
@@ -895,7 +1045,9 @@ export default function HalloweenPuno() {
                   <div className="text-6xl font-black mb-4 text-primary drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
                     S/ 10
                   </div>
-                  <div className="text-base text-muted-foreground line-through mb-8">S/ 15</div>
+                  <div className="text-base text-muted-foreground line-through mb-8">
+                    S/ 15
+                  </div>
                   <ul className="space-y-4 text-sm text-left mb-10">
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
@@ -903,7 +1055,9 @@ export default function HalloweenPuno() {
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">1 bebida de cortesía</span>
+                      <span className="font-semibold">
+                        1 bebida de cortesía
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
@@ -925,16 +1079,24 @@ export default function HalloweenPuno() {
                   <div className="text-sm text-muted-foreground mb-3 uppercase tracking-[0.2em] font-bold">
                     Venta en Puerta
                   </div>
-                  <div className="text-6xl font-black mb-4 text-primary">S/ 15</div>
-                  <div className="text-base text-muted-foreground line-through mb-8">S/ 20</div>
+                  <div className="text-6xl font-black mb-4 text-primary">
+                    S/ 15
+                  </div>
+                  <div className="text-base text-muted-foreground line-through mb-8">
+                    S/ 20
+                  </div>
                   <ul className="space-y-4 text-sm text-left mb-10">
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Acceso al evento completo</span>
+                      <span className="font-semibold">
+                        Acceso al evento completo
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Participación en concursos</span>
+                      <span className="font-semibold">
+                        Participación en concursos
+                      </span>
                     </li>
                     <li className="flex items-center gap-3">
                       <div className="w-2 h-2 rounded-full bg-primary" />
@@ -956,7 +1118,8 @@ export default function HalloweenPuno() {
               <Card className="inline-block p-6 bg-primary/10 border-2 border-primary/30 backdrop-blur-xl">
                 <p className="text-sm text-muted-foreground font-semibold flex items-center gap-2">
                   <Sparkles className="w-5 h-5 text-primary" />
-                  Descuento válido solo para compras anticipadas • Cupos limitados
+                  Descuento válido solo para compras anticipadas • Cupos
+                  limitados
                   <Sparkles className="w-5 h-5 text-primary" />
                 </p>
               </Card>
@@ -978,16 +1141,29 @@ export default function HalloweenPuno() {
                   </span>
                 </div>
                 <p className="text-muted-foreground mb-6 leading-relaxed">
-                  La celebración de Halloween más espectacular de Puno. Una noche épica que no olvidarás.
+                  La celebración de Halloween más espectacular de Puno. Una
+                  noche épica que no olvidarás.
                 </p>
                 <div className="flex gap-4">
-                  <Button size="sm" variant="outline" className="border-primary/50 hover:bg-primary/10 bg-transparent">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/50 hover:bg-primary/10 bg-transparent"
+                  >
                     Facebook
                   </Button>
-                  <Button size="sm" variant="outline" className="border-primary/50 hover:bg-primary/10 bg-transparent">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/50 hover:bg-primary/10 bg-transparent"
+                  >
                     Instagram
                   </Button>
-                  <Button size="sm" variant="outline" className="border-primary/50 hover:bg-primary/10 bg-transparent">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-primary/50 hover:bg-primary/10 bg-transparent"
+                  >
                     TikTok
                   </Button>
                 </div>
@@ -1046,14 +1222,20 @@ export default function HalloweenPuno() {
                 © 2025 Halloween Puno. Todos los derechos reservados.
               </div>
               <div className="flex gap-6 text-sm text-muted-foreground">
-                <button className="hover:text-primary transition-colors font-semibold">Términos</button>
-                <button className="hover:text-primary transition-colors font-semibold">Privacidad</button>
-                <button className="hover:text-primary transition-colors font-semibold">Cookies</button>
+                <button className="hover:text-primary transition-colors font-semibold">
+                  Términos
+                </button>
+                <button className="hover:text-primary transition-colors font-semibold">
+                  Privacidad
+                </button>
+                <button className="hover:text-primary transition-colors font-semibold">
+                  Cookies
+                </button>
               </div>
             </div>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }
