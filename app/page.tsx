@@ -59,7 +59,7 @@ export default function HalloweenPuno() {
       return;
     }
 
-    const winProbability = 0.8;
+    const winProbability = 0.05;
 
     setIsSpinning(true);
     setWinner(null);
