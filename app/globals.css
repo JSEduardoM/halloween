@@ -1,0 +1,164 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* Paleta de colores personalizada con tonos rojizos oscuros y fucsia neón */
+  --color-negro-rojizo1: #020001;
+  --color-negro-rojizo2: #010000;
+  --color-negro-vino: #090000;
+  --color-sombra: #020000;
+  --color-tenue: #050002;
+  --color-vino-oscuro: #52001c;
+  --color-fucsia-neon: #ff0066;
+
+  --background: var(--color-negro-rojizo1);
+  --foreground: #ffffff;
+  --card: var(--color-negro-vino);
+  --card-foreground: #ffffff;
+  --popover: var(--color-negro-vino);
+  --popover-foreground: #ffffff;
+  --primary: var(--color-fucsia-neon);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-vino-oscuro);
+  --secondary-foreground: #ffffff;
+  --muted: var(--color-tenue);
+  --muted-foreground: #a0a0a0;
+  --accent: var(--color-fucsia-neon);
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: var(--color-vino-oscuro);
+  --input: var(--color-negro-vino);
+  --ring: var(--color-fucsia-neon);
+  --radius: 0.75rem;
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: var(--color-negro-rojizo2);
+  --foreground: #ffffff;
+  --card: var(--color-negro-vino);
+  --card-foreground: #ffffff;
+  --popover: var(--color-negro-vino);
+  --popover-foreground: #ffffff;
+  --primary: var(--color-fucsia-neon);
+  --primary-foreground: #ffffff;
+  --secondary: var(--color-vino-oscuro);
+  --secondary-foreground: #ffffff;
+  --muted: var(--color-tenue);
+  --muted-foreground: #a0a0a0;
+  --accent: var(--color-fucsia-neon);
+  --accent-foreground: #ffffff;
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --border: var(--color-vino-oscuro);
+  --input: var(--color-negro-vino);
+  --ring: var(--color-fucsia-neon);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  /* Añadiendo animación de parpadeo para el cursor */
+  @keyframes ghost-pulse {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Cursor personalizado de fantasma con animación de parpadeo */
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='font-size:32px'><text y='32' style='animation: ghost-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;'>👻</text></svg>")
+      16 0, auto;
+  }
+
+  /* Cursor pointer para elementos interactivos con parpadeo */
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='40' height='48' viewport='0 0 100 100' style='font-size:32px'><text y='32'>👻</text></svg>")
+      16 0, pointer;
+  }
+
+  /* Añadiendo clase helper para el parpadeo del cursor */
+  .cursor-ghost-pulse {
+    animation: ghost-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
