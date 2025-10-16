@@ -1106,8 +1106,7 @@ export default function HalloweenPuno() {
               <Card className="p-10 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/50 transition-all hover:shadow-2xl hover:shadow-primary/20 hover:scale-105">
                 <div className="text-center">
                   <div className="text-sm text-muted-foreground mb-3 uppercase tracking-[0.2em] font-bold">
-                    Entrada Preventa
-                  </div>
+                    Entrada Preventa hasta 16 de octubre                  </div>
                   <div className="text-6xl font-black mb-4 text-primary">
                     S/ 10
                   </div>
@@ -1160,26 +1159,37 @@ export default function HalloweenPuno() {
                   <div className="text-base text-muted-foreground line-through mb-8">
                     S/ 20
                   </div>
-                  <ul className="space-y-4 text-sm text-left mb-10">
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Todo lo de Preventa</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">
-                        1 bebida de cortesía
+                <ul className="space-y-4 text-sm text-left mb-10">
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="font-semibold">Todo lo de Preventa</span>
+                  </li>
+
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="font-semibold">
+                      Jarra gratis por grupo de 4 personas
+                      <br />
+                      <span className="text-muted-foreground text-xs font-normal">
+                        (Válido con sus boletos entre las 8 p.m. y 9 p.m.)
                       </span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Acceso prioritario</span>
-                    </li>
-                    <li className="flex items-center gap-3">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="font-semibold">Zona de descanso</span>
-                    </li>
-                  </ul>
+                    </span>
+                  </li>
+
+                  <li className="flex items-center gap-3">
+                    <div className="w-2 h-2 rounded-full bg-primary" />
+                    <span className="font-semibold">Acceso al evento</span>
+                  </li>
+
+                  <li className="flex items-center gap-3 mt-6">
+                    <Sparkles className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-muted-foreground font-semibold">
+                      Descuento válido solo para compras anticipadas • Cupos limitados
+                    </span>
+                    <Sparkles className="w-4 h-4 text-primary" />
+                  </li>
+                </ul>
+
                 <a
                   href="https://chat.whatsapp.com/GI2xg20upUCGLCoklUEpA2?mode=wwt"
                   target="_blank"
@@ -1242,16 +1252,16 @@ export default function HalloweenPuno() {
               </Card>
             </div>
 
-            <div className="text-center">
-              <Card className="inline-block p-6 bg-primary/10 border-2 border-primary/30 backdrop-blur-xl">
-                <p className="text-sm text-muted-foreground font-semibold flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-primary" />
-                  Descuento válido solo para compras anticipadas • Cupos
-                  limitados
-                  <Sparkles className="w-5 h-5 text-primary" />
-                </p>
-              </Card>
-            </div>
+          <div className="text-center">
+            <Card className="inline-block p-6 bg-primary/10 border-2 border-primary/30 backdrop-blur-xl">
+              <p className="text-sm text-muted-foreground font-semibold flex items-center justify-center gap-2">
+                <Sparkles className="w-5 h-5 text-primary" />
+                Descuento válido solo para compras anticipadas • Cupos limitados
+                <Sparkles className="w-5 h-5 text-primary" />
+              </p>
+            </Card>
+          </div>
+
           </div>
         </div>
       </section>
