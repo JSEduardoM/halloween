@@ -7,7 +7,7 @@ import { WinnerProvider } from "@/hooks/WinnerProvider";
 
 export const metadata: Metadata = {
   title: "La zona del pecado",
-  description: "Creador por Noe y Chimuelo",
+  description: "Creador por Chimuelo",
 };
 
 export default function RootLayout({
