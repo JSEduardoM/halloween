@@ -386,13 +386,19 @@ export default function HalloweenPuno() {
 
             {/* CTAs principales */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mb-12 sm:mb-20 px-4">
+            <a
+              href="https://chat.whatsapp.com/GI2xg20upUCGLCoklUEpA2?mode=wwt"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button
                 size="lg"
-                onClick={() => scrollToSection("entradas")}
                 className="w-full sm:w-auto bg-primary text-primary-foreground hover:bg-primary/90 text-lg sm:text-xl px-8 sm:px-12 py-6 sm:py-8 shadow-2xl shadow-primary/50 hover:shadow-[0_0_40px_rgba(255,0,102,0.6)] transition-all hover:scale-110 font-black tracking-wide"
               >
                 COMPRAR ENTRADAS →
               </Button>
+            </a>
+
               <Button
                 size="lg"
                 variant="outline"
@@ -411,19 +417,27 @@ export default function HalloweenPuno() {
                   31 OCT
                 </div>
                 <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
-                  8:00 PM - 3:00 AM
+                  8:00 PM - 4:00 AM
                 </div>
               </Card>
 
-              <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
-                <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
-                <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
-                  PUNO
-                </div>
+              <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group cursor-pointer">
+                <a
+                  href="https://www.google.com/maps/place/Club+de+Tiro,+Puno/@-15.861286,-70.0177659,843m/data=!3m2!1e3!4b1!4m6!3m5!1s0x915d6a2624f413ab:0xa614d62cb93169f6!8m2!3d-15.8612912!4d-70.015191!16s%2Fg%2F11gfbgz9tt?entry=ttu&g_ep=EgoyMDI1MTAxMy4wIKXMDSoASAFQAw%3D%3D"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block"
+                >
+                  <MapPin className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
+                  <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
+                    PUNO
+                  </div>
+                </a>
                 <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
                   Local Club del Tiro
                 </div>
               </Card>
+
 
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <Music className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
@@ -431,14 +445,14 @@ export default function HalloweenPuno() {
                   DJ
                 </div>
                 <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
-                  + 2 Bandas en Vivo
+                  Musica en Vivo
                 </div>
               </Card>
 
               <Card className="p-6 sm:p-8 bg-card/60 backdrop-blur-xl border-2 border-primary/20 hover:border-primary/60 hover:bg-card/80 hover:scale-110 hover:shadow-2xl hover:shadow-primary/30 transition-all group">
                 <Users className="w-8 h-8 sm:w-10 sm:h-10 text-primary mb-3 sm:mb-4 mx-auto group-hover:scale-125 transition-transform" />
                 <div className="text-2xl sm:text-3xl font-black mb-2 text-primary">
-                  500+
+                  700+
                 </div>
                 <div className="text-xs sm:text-sm text-muted-foreground font-semibold">
                   Asistentes
@@ -783,7 +797,7 @@ export default function HalloweenPuno() {
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <Star className="w-6 h-6" />
-                  <span>Premios hasta S/ 500</span>
+                  <span>Premios sorpresa</span>
                 </div>
               </Card>
 
@@ -800,7 +814,7 @@ export default function HalloweenPuno() {
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <Sparkles className="w-6 h-6" />
-                  <span>5 DJs + 2 Bandas</span>
+                  <span>DJs</span>
                 </div>
               </Card>
 
@@ -809,15 +823,15 @@ export default function HalloweenPuno() {
                   <Heart className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-3xl font-black mb-5 text-center">
-                  Experiencias VIP
+                  Experiencia Unica
                 </h3>
                 <p className="text-muted-foreground leading-relaxed mb-6 text-center">
-                  Acceso exclusivo a zonas VIP, bebidas premium, y la mejor
+                  Acceso exclusivo al evento, bebidas, y la mejor
                   vista del evento. Cupos limitados.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-primary font-bold text-lg">
                   <PartyPopper className="w-6 h-6" />
-                  <span>Solo 50 pases VIP</span>
+                  <span>Compra ya!</span>
                 </div>
               </Card>
             </div>
@@ -876,8 +890,7 @@ export default function HalloweenPuno() {
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
                       <Music className="w-6 h-6 text-secondary" />
-                      DJ Set Opening - DJ Phantom
-                    </h3>
+                      DJ Jackson Fernández - Dj Pegaloco                    </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Inicio oficial con el mejor DJ local. Música electrónica,
                       house y los mejores remixes para calentar la pista.
@@ -904,7 +917,7 @@ export default function HalloweenPuno() {
                     <p className="text-muted-foreground leading-relaxed">
                       Desfile de participantes en el escenario principal.
                       Categorías: Más Terrorífico, Más Creativo, Mejor Grupo.
-                      Premios de hasta S/ 500.
+                      Premios sorpresa.
                     </p>
                   </div>
                 </div>
@@ -923,7 +936,7 @@ export default function HalloweenPuno() {
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
                       <Music className="w-6 h-6 text-secondary" />
-                      Banda en Vivo - Los Espectros
+                      Musica en Vivo
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Rock alternativo y covers de clásicos. Una hora de música
@@ -946,11 +959,10 @@ export default function HalloweenPuno() {
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
                       <Sparkles className="w-6 h-6 text-primary" />
-                      DJ Internacional - DJ Shadow
+                      DJ Jackson Fernández
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      El momento más esperado de la noche. DJ invitado especial
-                      desde Lima con los mejores beats de EDM y techno.
+                      El momento más esperado de la noche. DJ invitado especial con los mejores beats de EDM y techno.
                     </p>
                   </div>
                 </div>
@@ -1040,7 +1052,7 @@ export default function HalloweenPuno() {
                   <div>
                     <h3 className="text-2xl font-bold mb-2">Capacidad</h3>
                     <p className="text-muted-foreground leading-relaxed">
-                      Aforo limitado a 500 personas
+                      Aforo limitado a 700 personas
                       <br />
                       ¡Asegura tu entrada anticipada!
                     </p>
@@ -1053,9 +1065,8 @@ export default function HalloweenPuno() {
                     Cómo llegar
                   </h4>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• A 5 minutos caminando de la Plaza de Armas</li>
-                    <li>• Estacionamiento disponible en Jr. Deustua</li>
-                    <li>• Acceso directo desde Av. El Sol</li>
+                    <li>• A 1 minutos caminando de la Plaza Vea</li>
+                    <li>• Acceso directo desde Jr. Pineda Arce</li>
                   </ul>
                 </Card>
               </div>
@@ -1098,10 +1109,10 @@ export default function HalloweenPuno() {
                     Entrada Preventa
                   </div>
                   <div className="text-6xl font-black mb-4 text-primary">
-                    S/ 7
+                    S/ 10
                   </div>
                   <div className="text-base text-muted-foreground line-through mb-8">
-                    S/ 10
+                    S/ 15
                   </div>
                   <ul className="space-y-4 text-sm text-left mb-10">
                     <li className="flex items-center gap-3">
@@ -1121,9 +1132,17 @@ export default function HalloweenPuno() {
                       <span className="font-semibold">Música en vivo</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-card hover:bg-primary/20 text-foreground border-2 border-primary/50 hover:border-primary font-bold text-lg py-6">
+                <a
+                  href="https://chat.whatsapp.com/GI2xg20upUCGLCoklUEpA2?mode=wwt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black text-lg py-6 shadow-lg shadow-primary/50 hover:shadow-xl hover:shadow-primary/60">
                     COMPRAR
                   </Button>
+                </a>
+
                 </div>
               </Card>
 
@@ -1136,10 +1155,10 @@ export default function HalloweenPuno() {
                     Entrada Popular
                   </div>
                   <div className="text-6xl font-black mb-4 text-primary drop-shadow-[0_0_20px_rgba(255,0,102,0.6)]">
-                    S/ 10
+                    S/ 15
                   </div>
                   <div className="text-base text-muted-foreground line-through mb-8">
-                    S/ 15
+                    S/ 20
                   </div>
                   <ul className="space-y-4 text-sm text-left mb-10">
                     <li className="flex items-center gap-3">
@@ -1161,9 +1180,17 @@ export default function HalloweenPuno() {
                       <span className="font-semibold">Zona de descanso</span>
                     </li>
                   </ul>
+                <a
+                  href="https://chat.whatsapp.com/GI2xg20upUCGLCoklUEpA2?mode=wwt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
                   <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black text-lg py-6 shadow-lg shadow-primary/50 hover:shadow-xl hover:shadow-primary/60">
                     COMPRAR AHORA
                   </Button>
+                </a>
+
                 </div>
               </Card>
 
@@ -1173,7 +1200,7 @@ export default function HalloweenPuno() {
                     Venta en Puerta
                   </div>
                   <div className="text-6xl font-black mb-4 text-primary">
-                    S/ 15
+                    S/ 20
                   </div>
                   <div className="text-base text-muted-foreground line-through mb-8">
                     S/ 20
@@ -1200,9 +1227,17 @@ export default function HalloweenPuno() {
                       <span className="font-semibold">Acceso prioritario</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 font-bold text-lg py-6 border-2 border-secondary">
+                <a
+                  href="https://chat.whatsapp.com/GI2xg20upUCGLCoklUEpA2?mode=wwt"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full"
+                >
+                  <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-black text-lg py-6 shadow-lg shadow-primary/50 hover:shadow-xl hover:shadow-primary/60">
                     COMPRAR
                   </Button>
+                </a>
+
                 </div>
               </Card>
             </div>
@@ -1303,7 +1338,7 @@ export default function HalloweenPuno() {
               <div>
                 <h4 className="font-black text-lg mb-4">Contacto</h4>
                 <ul className="space-y-3 text-sm text-muted-foreground">
-                  <li className="font-semibold">info@halloweenpuno.com</li>
+                  <li className="font-semibold">zona@halloweenpuno.com</li>
                   <li className="font-semibold">+51 951 234 567</li>
                   <li className="font-semibold">Puno, Perú</li>
                 </ul>
